@@ -35,7 +35,7 @@ int main() {
         printf("uri: %s\n", data->uri);
         printf("version: %s\n", data->version);
 
-        char *response = "Hello from server";
+        char *response = "HTTP/1.0 200 OK\r\n\r\n";
         send(accepted_socket, response, strlen(response), 0);
 
         close(accepted_socket);
