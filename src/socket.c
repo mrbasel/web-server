@@ -22,6 +22,14 @@ int create_server_socket(struct sockaddr_in* address) {
         exit(EXIT_FAILURE);
     }
 
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+                &opt, sizeof(opt))) {
+        perror("setsockopt failed");
+        exit(EXIT_FAILURE);
+    }
+
+
     // bind socket to address and port
     if (bind(server_fd, (struct sockaddr *)address, sizeof(struct sockaddr_in)) < 0) {
         perror("bind failed");
@@ -45,8 +53,6 @@ int accept_connection(int server_fd, struct sockaddr_in* address, char* buffer, 
         perror("accept failed");
         exit(EXIT_FAILURE);
     }
-
-    printf("New client connected\n");
 
     int valread = read(accepted_socket, buffer, n);
     

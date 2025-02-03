@@ -6,6 +6,21 @@
 #define PORT 8000
 #define BUFFER_SIZE 1024
 
+typedef struct {
+    char* method;
+    char* uri;
+    char* version;
+} http_request;
+
+http_request* parseRequest(char* request) {
+    http_request* parsed_request = malloc(sizeof(http_request));
+    char* token;
+    parsed_request->method = strsep(&request, " ");
+    parsed_request->uri = strsep(&request, " ");
+    parsed_request->version = strsep(&request, "\r");
+    return parsed_request;
+}
+
 int main() {
     char buffer[BUFFER_SIZE] = {0};
     struct sockaddr_in* address = create_server_sockaddr(PORT);
@@ -14,10 +29,14 @@ int main() {
     int accepted_socket;
     while(1) {
         accepted_socket = accept_connection(server_fd, address, buffer, BUFFER_SIZE);
-        printf("Received message: %s\n", buffer);
+        http_request* data = parseRequest(buffer);
+
+        printf("method: %s\n", data->method);
+        printf("uri: %s\n", data->uri);
+        printf("version: %s\n", data->version);
+
         char *response = "Hello from server";
         send(accepted_socket, response, strlen(response), 0);
-        printf("Response sent\n");
 
         close(accepted_socket);
     }
