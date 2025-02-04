@@ -10,12 +10,20 @@
 int main() {
     char buffer[BUFFER_SIZE] = {0};
     struct sockaddr_in* address = create_server_sockaddr(PORT);
+    if (address == NULL) {
+        fprintf(stderr, "could not create socket\n"); 
+        abort();
+    }
     int server_fd = create_server_socket(address);
 
     int accepted_socket;
     while(1) {
         accepted_socket = accept_connection(server_fd, address, buffer, BUFFER_SIZE);
-        HttpRequest* data = parse_request(buffer);
+        HttpRequest* parsed_request = parse_request(buffer);
+        if (parse_request == NULL) {
+            fprintf(stderr, "could not parse request\n");
+            continue;
+        }
 
         printf("method: %s\n", parsed_request->method);
         printf("uri: %s\n", parsed_request->uri);

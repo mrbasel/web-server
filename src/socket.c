@@ -7,6 +7,7 @@
 
 struct sockaddr_in* create_server_sockaddr(int port) {
     struct sockaddr_in* address = malloc(sizeof(struct sockaddr_in));
+    if (address == NULL) return NULL;
     bzero(address, sizeof(struct sockaddr_in)); 
     address->sin_family = AF_INET;
     address->sin_addr.s_addr = INADDR_ANY;

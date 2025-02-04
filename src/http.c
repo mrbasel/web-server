@@ -7,11 +7,14 @@
 
 HttpRequest* parse_request(char* request) {
     HttpRequest* parsed_request = malloc(sizeof(HttpRequest));
+    if (parsed_request == NULL) return NULL;
+
     parsed_request->method = strsep(&request, " ");
     parsed_request->uri = strsep(&request, " ");
     parsed_request->version = strsep(&request, "\r\n");
 
     HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
+    if (headers == NULL) return NULL;
     parsed_request->headers = headers;
 
     // parse request headers
