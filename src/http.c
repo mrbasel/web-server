@@ -27,3 +27,9 @@ HttpRequest* parse_request(char* request) {
     parsed_request->headers_count = i;
     return parsed_request;
 }
+
+
+void free_request(HttpRequest* request) {
+    free(request->headers);
+    free(request);
+}

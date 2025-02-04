@@ -14,3 +14,5 @@ typedef struct {
 
 
 HttpRequest* parse_request(char* request);
+
+void free_request(HttpRequest* request);
