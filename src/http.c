@@ -5,13 +5,13 @@
 
 #define MAX_REQUEST_HEADERS_COUNT 100
 
-http_request* parseRequest(char* request) {
-    http_request* parsed_request = malloc(sizeof(http_request));
+HttpRequest* parse_request(char* request) {
+    HttpRequest* parsed_request = malloc(sizeof(HttpRequest));
     parsed_request->method = strsep(&request, " ");
     parsed_request->uri = strsep(&request, " ");
     parsed_request->version = strsep(&request, "\r\n");
 
-    http_header* headers = malloc(sizeof(http_header) * MAX_REQUEST_HEADERS_COUNT);
+    HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
     parsed_request->headers = headers;
 
     // parse request headers

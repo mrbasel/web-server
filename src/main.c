@@ -15,7 +15,7 @@ int main() {
     int accepted_socket;
     while(1) {
         accepted_socket = accept_connection(server_fd, address, buffer, BUFFER_SIZE);
-        http_request* data = parseRequest(buffer);
+        HttpRequest* data = parse_request(buffer);
 
         printf("method: %s\n", data->method);
         printf("uri: %s\n", data->uri);

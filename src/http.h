@@ -2,15 +2,15 @@
 typedef struct {
     char* name;
     char* value;
-} http_header;
+} HttpHeader;
 
 typedef struct {
     char* method;
     char* uri;
     char* version;
-    http_header* headers;
+    HttpHeader* headers;
     int headers_count;
-} http_request;
+} HttpRequest;
 
 
-http_request* parseRequest(char* request);
+HttpRequest* parse_request(char* request);
