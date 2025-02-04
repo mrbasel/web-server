@@ -9,6 +9,7 @@ typedef struct {
     char* uri;
     char* version;
     http_header* headers;
+    int headers_count;
 } http_request;
 
 

@@ -20,6 +20,9 @@ int main() {
         printf("method: %s\n", data->method);
         printf("uri: %s\n", data->uri);
         printf("version: %s\n", data->version);
+        
+        for (int i = 0; i < data->headers_count; i++) printf("%s: %s", data->headers[i].name, data->headers[i].value);
+        printf("\n");
 
         char response[100] = "HTTP/1.0 200 OK\r\n\r\nRequested path: ";
         strcat(response, data->uri);
