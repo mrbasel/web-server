@@ -53,7 +53,9 @@ HttpResponse* _create_response(HttpRequest* request) {
     if (!strcmp(request->uri, "/") || !strcmp(request->uri, "/index.html")) {
         response->statusCode = "200";
         response->reason = "OK";
-        response->body = fetch_resource(request);
+        int body_len = 0;
+        response->body = fetch_resource(request, &body_len);
+        response->body_len = body_len;
         return response;
     }
     response->statusCode = "404";
@@ -81,16 +83,15 @@ char* create_response(HttpRequest* request) {
         for (int j = 0; response->body[j] != 0; j++) {
             buffer[i++] = response->body[j];
         }
-        free(response->body);
+        buffer[i] = 0;
     }
 
-    buffer[i] = 0;
     free_response(response);
     return buffer;
 }
 
 
-char* fetch_resource(HttpRequest* request) {
+char* fetch_resource(HttpRequest* request, int* body_len) {
     char* resource = malloc(5000);
 
     char buffer[100];
@@ -103,6 +104,7 @@ char* fetch_resource(HttpRequest* request) {
         }
     };
     resource[i] = 0;
+    *body_len = i;
     return resource;
 }
 
@@ -113,5 +115,6 @@ void free_request(HttpRequest* request) {
 
 void free_response(HttpResponse* response) {
     //free(response->headers);
+    if (response->body_len > 0) free(response->body);
     free(response);
 }
