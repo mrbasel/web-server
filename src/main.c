@@ -32,8 +32,7 @@ int main() {
         for (int i = 0; i < parsed_request->headers_count; i++) printf("%s: %s", parsed_request->headers[i].name, parsed_request->headers[i].value);
         printf("\n");
 
-        char response[100] = "HTTP/1.0 200 OK\r\n\r\nRequested path: ";
-        strcat(response, parsed_request->uri);
+        char* response = create_response(parsed_request); 
         send(accepted_socket, response, strlen(response), 0);
 
         free_request(parsed_request);
