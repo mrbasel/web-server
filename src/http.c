@@ -34,14 +34,15 @@ HttpRequest* parse_request(char* request) {
 
 HttpResponse* _create_response(HttpRequest* request) {
     HttpResponse* response = malloc(sizeof(HttpResponse));
+    response->headers_count = 0;
+    response->body_len = 0;
     if (response == NULL) return NULL;
-    /*
     HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
+    response->headers = headers;
     if (headers == NULL) return NULL;
 
-    headers[0].name = "Server";
-    headers[1].value = "http server";
-    */
+    add_header(response, "Server", "Http Server");
+    add_header(response, "Date", "dunno");
 
     response->version = "HTTP/1.1";
     if (strcmp(request->method, "GET") != 0) {
@@ -76,6 +77,19 @@ char* create_response(HttpRequest* request) {
     for (int j = 0; response->reason[j] != 0; j++) buffer[i++] = response->reason[j];
     buffer[i++] = '\r';
     buffer[i++] = '\n';
+
+    for (int j = 0; j < response->headers_count; j++) {
+        HttpHeader header = response->headers[j];
+        int name_len = strlen(header.name);
+        int value_len = strlen(header.value);
+        strcpy(buffer + i, header.name);
+        i += name_len;
+        buffer[i++] = ':';
+        strcpy(buffer + i, header.value);
+        i += value_len;
+        buffer[i++] = '\r';
+        buffer[i++] = '\n';
+    }
     buffer[i++] = '\r';
     buffer[i++] = '\n';
 
@@ -108,13 +122,17 @@ char* fetch_resource(HttpRequest* request, int* body_len) {
     return resource;
 }
 
+void add_header(HttpResponse* response, char* name, char* value) {
+    response->headers[response->headers_count++] = (HttpHeader){name, value};
+}
+
 void free_request(HttpRequest* request) {
     free(request->headers);
     free(request);
 }
 
 void free_response(HttpResponse* response) {
-    //free(response->headers);
+    free(response->headers);
     if (response->body_len > 0) free(response->body);
     free(response);
 }
