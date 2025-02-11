@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "http.h"
+#include "server.h"
 #include "socket.h"
 
 #define BUFFER_SIZE 1024
@@ -18,7 +18,7 @@ Server* create_server(int port) {
     return server;
 }
 
-void server_listen(Server* server, onRequest on_request) {
+void server_listen(Server* server, RequestHandler handler) {
     char buffer[BUFFER_SIZE] = {0};
 
     int accepted_socket;
@@ -38,7 +38,7 @@ void server_listen(Server* server, onRequest on_request) {
         printf("\n");
 
         HttpResponse* response = create_response(parsed_request); 
-        on_request(parsed_request, response);
+        handler(parsed_request, response);
         char* serialized_response = serialize_response(response);
         send(accepted_socket, serialized_response, strlen(serialized_response), 0);
 

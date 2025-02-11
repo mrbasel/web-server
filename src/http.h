@@ -1,14 +1,3 @@
-
-typedef struct {
-   int _socket_fd; 
-   struct sockaddr_in* _socket_addr;
-   int port;
-} Server;
-
-
-
-void free_server(Server* server);
-
 typedef struct {
     char* name;
     char* value;
@@ -31,12 +20,6 @@ typedef struct {
     char* body;
     int body_len;
 } HttpResponse;
-
-typedef HttpResponse* (*onRequest)(HttpRequest*, HttpResponse*);
-
-Server* create_server(int port);
-
-void server_listen(Server* server, onRequest on_request);
 
 HttpRequest* parse_request(char* request);
 
