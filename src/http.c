@@ -32,7 +32,7 @@ HttpRequest* parse_request(char* request) {
     return parsed_request;
 }
 
-HttpResponse* _create_response(HttpRequest* request) {
+HttpResponse* create_response(HttpRequest* request) {
     HttpResponse* response = malloc(sizeof(HttpResponse));
     response->headers_count = 0;
     response->body_len = 0;
@@ -64,8 +64,7 @@ HttpResponse* _create_response(HttpRequest* request) {
     return response;
 }
 
-char* create_response(HttpRequest* request) {
-    HttpResponse* response = _create_response(request);
+char* serialize_response(HttpResponse* response) {
     char* buffer = malloc(sizeof(char) * MAX_RESPONSE_SIZE);
     int i = 0;
     for (int j = 0; response->version[j] != 0; j++) buffer[i++] = response->version[j];
