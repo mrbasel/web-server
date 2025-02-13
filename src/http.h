@@ -34,3 +34,5 @@ void add_header(HttpResponse* response, char* name, char* value);
 void free_request(HttpRequest* request);
 
 void free_response(HttpResponse* response);
+
+void log_http_transaction(HttpRequest* request, HttpResponse* response);

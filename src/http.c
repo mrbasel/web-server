@@ -135,3 +135,7 @@ void free_response(HttpResponse* response) {
     if (response->body_len > 0) free(response->body);
     free(response);
 }
+
+void log_http_transaction(HttpRequest* request, HttpResponse* response) {
+    printf("%s %s %s %s\n", request->method, request->uri, request->version, response->statusCode);
+}

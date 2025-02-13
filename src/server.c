@@ -25,19 +25,15 @@ void server_listen(Server* server, RequestHandler handler) {
     while(1) {
         accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr, buffer, BUFFER_SIZE);
         HttpRequest* parsed_request = parse_request(buffer);
-        if (parse_request == NULL) {
+        if (parsed_request == NULL) {
             fprintf(stderr, "could not parse request\n");
             continue;
         }
 
-        printf("method: %s\n", parsed_request->method);
-        printf("uri: %s\n", parsed_request->uri);
-        printf("version: %s\n", parsed_request->version);
-
-        for (int i = 0; i < parsed_request->headers_count; i++) printf("%s: %s", parsed_request->headers[i].name, parsed_request->headers[i].value);
-        printf("\n");
 
         HttpResponse* response = create_response(parsed_request); 
+        log_http_transaction(parsed_request, response);
+
         handler(parsed_request, response);
         char* serialized_response = serialize_response(response);
         send(accepted_socket, serialized_response, strlen(serialized_response), 0);
