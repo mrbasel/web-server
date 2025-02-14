@@ -40,7 +40,6 @@ int handle_request(void* arg) {
 
     HttpResponse* response = create_response(parsed_request);
     log_http_transaction(parsed_request, response);
-    sleep(5);
 
     handler(parsed_request, response);
     char* serialized_response = serialize_response(response);
