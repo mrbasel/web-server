@@ -48,6 +48,13 @@ HttpResponse* create_response(HttpRequest* request) {
     add_header(response, strdup("Date"), strdup(date_buffer));
 
     response->version = "HTTP/1.1";
+
+    if (!request->method || !request->uri || !request->version) {
+        response->statusCode = "400";
+        response->reason = "Bad Request";
+        return response;
+    }
+
     if (strcmp(request->method, "GET") != 0) {
         response->statusCode = "501";
         response->reason = "Not Implemented";
