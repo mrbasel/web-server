@@ -13,7 +13,8 @@ HttpRequest* parse_request(char* request) {
 
     parsed_request->method = strsep(&request, " ");
     parsed_request->uri = strsep(&request, " ");
-    parsed_request->version = strsep(&request, "\r\n");
+    parsed_request->version = strsep(&request, "\r");
+    if (request != NULL) request++; // skip newline
 
     HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
     if (headers == NULL) return NULL;
@@ -23,7 +24,9 @@ HttpRequest* parse_request(char* request) {
     int i = 0;
     while (1) {
         char* name = strsep(&request, ":");
+        if (request != NULL && *request == ' ') request++; // skip whitespace
         char* value = strsep(&request, "\r\n");
+
         if (!name || !value) break;
         headers[i].name = name;
         headers[i].value = value;
