@@ -1,40 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include "http.h"
-
-#define MAX_REQUEST_HEADERS_COUNT 100
-#define MAX_RESPONSE_SIZE 10000
-
-HttpRequest* parse_request(char* request) {
-    HttpRequest* parsed_request = malloc(sizeof(HttpRequest));
-    if (parsed_request == NULL) return NULL;
-
-    parsed_request->method = strsep(&request, " ");
-    parsed_request->uri = strsep(&request, " ");
-    parsed_request->version = strsep(&request, "\r");
-    if (request != NULL) request++; // skip newline
-
-    HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
-    if (headers == NULL) return NULL;
-    parsed_request->headers = headers;
-
-    // parse request headers
-    int i = 0;
-    while (1) {
-        char* name = strsep(&request, ":");
-        if (request != NULL && *request == ' ') request++; // skip whitespace
-        char* value = strsep(&request, "\r\n");
-
-        if (!name || !value) break;
-        headers[i].name = name;
-        headers[i].value = value;
-        i++;
-    }
-    parsed_request->headers_count = i;
-    return parsed_request;
-}
+#include "http/constants.h"
+#include "http/headers.h"
+#include "http/request.h"
+#include "http/response.h"
+#include "http/utils.h"
 
 HttpResponse* create_response(HttpRequest* request) {
     HttpResponse* response = malloc(sizeof(HttpResponse));
@@ -67,9 +38,8 @@ HttpResponse* create_response(HttpRequest* request) {
     if (!strcmp(request->uri, "/") || !strcmp(request->uri, "/index.html")) {
         response->statusCode = "200";
         response->reason = "OK";
-        int body_len = 0;
-        response->body = fetch_resource(request, &body_len);
-        response->body_len = body_len;
+        response->body = strdup("Hello, World!");
+        response->body_len = strlen(response->body);
         return response;
     }
     response->statusCode = "404";
@@ -116,6 +86,15 @@ char* serialize_response(HttpResponse* response) {
     return buffer;
 }
 
+void free_response(HttpResponse* response) {
+    for (int i = 0; i < response->headers_count; i++) {
+        free(response->headers[i].name);
+        free(response->headers[i].value);
+}
+    free(response->headers);
+    if (response->body_len > 0) free(response->body);
+    free(response);
+}
 
 char* fetch_resource(HttpRequest* request, int* body_len) {
     char* resource = malloc(5000);
@@ -134,45 +113,4 @@ char* fetch_resource(HttpRequest* request, int* body_len) {
     return resource;
 }
 
-void add_header(HttpResponse* response, char* name, char* value) {
-    response->headers[response->headers_count++] = (HttpHeader){name, value};
-}
 
-void free_request(HttpRequest* request) {
-    free(request->headers);
-    free(request);
-}
-
-void free_response(HttpResponse* response) {
-    for (int i = 0; i < response->headers_count; i++) {
-        free(response->headers[i].name);
-        free(response->headers[i].value);
-}
-    free(response->headers);
-    if (response->body_len > 0) free(response->body);
-    free(response);
-}
-
-void log_http_transaction(HttpRequest* request, HttpResponse* response) {
-    printf("%s %s %s %s\n", request->method, request->uri, request->version, response->statusCode);
-}
-
-static const char *weekdays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-static const char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-char* get_date_string(char* buffer) {
-    time_t now = time(NULL);
-    struct tm gm_time;
-    gmtime_r(&now, &gm_time);
-    
-    sprintf(buffer, "%s, %02d %s %04d %02d:%02d:%02d GMT",
-            weekdays[gm_time.tm_wday],
-            gm_time.tm_mday,
-            months[gm_time.tm_mon],
-            gm_time.tm_year + 1900,
-            gm_time.tm_hour,
-            gm_time.tm_min,
-            gm_time.tm_sec);
-    
-    return buffer;
-}

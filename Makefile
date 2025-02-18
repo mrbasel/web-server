@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -fsanitize=address -g -I src
-SRCS = $(wildcard src/*.c)
+SRCS = $(shell find src -name '*.c' ! -path "*/tests/*")
 TEST_SRCS = src/tests/test.c
 PROGRAM = program
 TEST_PROGRAM = test_runner
