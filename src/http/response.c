@@ -105,7 +105,7 @@ char* fetch_resource(HttpRequest* request, int* body_len) {
     return resource;
 }
 
-char* get_status_code_reason(int status_code) {
+const char* get_status_code_reason(int status_code) {
     switch (status_code) {
         case 100: return "Continue";
         case 101: return "Switching Protocols";

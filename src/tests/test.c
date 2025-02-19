@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "http.h"
+#include "http/request.h"
+#include "http/headers.h"
 
 #define AssertTrue(desc, expression) \
 ++total_tests; \

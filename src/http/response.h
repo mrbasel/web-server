@@ -10,7 +10,7 @@ typedef HttpResponse* (*RequestHandler)(HttpRequest*, HttpResponse*);
 typedef struct HttpResponse{
     char* version;
     int statusCode;
-    char* reason;
+    const char* reason;
     struct HttpHeader* headers;
     int headers_count;
     char* body;
@@ -25,4 +25,4 @@ char* fetch_resource(struct HttpRequest* request, int* body_len);
 
 void free_response(HttpResponse* response);
 
-char* get_status_code_reason(int status_code);
+const char* get_status_code_reason(int status_code);
