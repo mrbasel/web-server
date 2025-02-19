@@ -43,36 +43,16 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler) {
 
 char* serialize_response(HttpResponse* response) {
     char* buffer = malloc(sizeof(char) * MAX_RESPONSE_SIZE);
-    int i = 0;
-    for (int j = 0; response->version[j] != 0; j++) buffer[i++] = response->version[j];
-    buffer[i++] = ' ';
-
-    i += sprintf(buffer + i, "%d", response->statusCode);
-    buffer[i++] = ' ';
-
-    for (int j = 0; response->reason[j] != 0; j++) buffer[i++] = response->reason[j];
-    buffer[i++] = '\r';
-    buffer[i++] = '\n';
-
+    char* buffer_ptr = buffer;
+    buffer_ptr += sprintf(buffer_ptr, "%s %d %s\r\n", response->version, response->statusCode, response->reason);
     for (int j = 0; j < response->headers_count; j++) {
         HttpHeader header = response->headers[j];
         int name_len = strlen(header.name);
         int value_len = strlen(header.value);
-        strcpy(buffer + i, header.name);
-        i += name_len;
-        buffer[i++] = ':';
-        strcpy(buffer + i, header.value);
-        i += value_len;
-        buffer[i++] = '\r';
-        buffer[i++] = '\n';
+        buffer_ptr += sprintf(buffer_ptr, "%s: %s\r\n", header.name, header.value);
     }
-    buffer[i++] = '\r';
-    buffer[i++] = '\n';
-
-    for (int j = 0; response->body[j] != 0; j++) {
-        buffer[i++] = response->body[j];
-    }
-    buffer[i] = 0;
+    buffer_ptr += sprintf(buffer_ptr, "\r\n");
+    buffer_ptr += sprintf(buffer_ptr, "%s", response->body);
 
     free_response(response);
     return buffer;
