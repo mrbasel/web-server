@@ -39,10 +39,10 @@ int handle_request(void* arg) {
         return 1;
     }
 
-    HttpResponse* response = create_response(parsed_request);
+    HttpResponse* response = create_response(parsed_request, handler);
+    handler(parsed_request, response);
     log_http_transaction(parsed_request, response);
 
-    handler(parsed_request, response);
     char* serialized_response = serialize_response(response);
     send(socket, serialized_response, strlen(serialized_response), 0);
 

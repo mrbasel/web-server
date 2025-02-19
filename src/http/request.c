@@ -38,5 +38,3 @@ void free_request(HttpRequest* request) {
     free(request->headers);
     free(request);
 }
-
-

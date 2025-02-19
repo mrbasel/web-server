@@ -5,7 +5,7 @@
 #include "http/response.h"
 
 void log_http_transaction(HttpRequest* request, HttpResponse* response) {
-    printf("%s %s %s %s\n", request->method, request->uri, request->version, response->statusCode);
+    printf("%s %s %s %d\n", request->method, request->uri, request->version, response->statusCode);
 }
 
 static const char *weekdays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};

@@ -5,9 +5,11 @@ typedef struct HttpResponse HttpResponse;
 struct HttpHeader;
 typedef struct HttpHeader HttpHeader;
 
+typedef HttpResponse* (*RequestHandler)(HttpRequest*, HttpResponse*);
+
 typedef struct HttpResponse{
     char* version;
-    char* statusCode;
+    int statusCode;
     char* reason;
     struct HttpHeader* headers;
     int headers_count;
@@ -15,10 +17,12 @@ typedef struct HttpResponse{
     int body_len;
 } HttpResponse;
 
-HttpResponse* create_response(struct HttpRequest* request);
+HttpResponse* create_response(HttpRequest* request, RequestHandler handler);
 
 char* serialize_response(HttpResponse* response);
 
 char* fetch_resource(struct HttpRequest* request, int* body_len);
 
 void free_response(HttpResponse* response);
+
+char* get_status_code_reason(int status_code);
