@@ -6,20 +6,21 @@
 #include "http/request.h"
 #include "http/response.h"
 #include "http/utils.h"
+#include "arena/arena.h"
 
-HttpResponse* create_response(HttpRequest* request, RequestHandler handler) {
-    HttpResponse* response = malloc(sizeof(HttpResponse));
+HttpResponse* create_response(HttpRequest* request, RequestHandler handler, Arena* arena) {
+    HttpResponse* response = arena_alloc(arena, sizeof(HttpResponse));
     response->headers_count = 0;
     response->body_len = 0;
     if (response == NULL) return NULL;
-    HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
+    HttpHeader* headers = arena_alloc(arena, sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
     response->headers = headers;
     if (headers == NULL) return NULL;
 
-    add_header(response, strdup("Server"), strdup("Http Server"));
-    char date_buffer[50];
+    add_header(response, "Server", "Http Server");
+    char* date_buffer = arena_alloc(arena, 50);
     get_date_string(date_buffer);
-    add_header(response, strdup("Date"), strdup(date_buffer));
+    add_header(response, "Date", date_buffer);
 
     response->version = "HTTP/1.1";
 
@@ -41,8 +42,8 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler) {
     return response;
 }
 
-char* serialize_response(HttpResponse* response) {
-    char* buffer = malloc(sizeof(char) * MAX_RESPONSE_SIZE);
+char* serialize_response(HttpResponse* response, Arena* arena) {
+    char* buffer = arena_alloc(arena, sizeof(char) * MAX_RESPONSE_SIZE);
     char* buffer_ptr = buffer;
     buffer_ptr += sprintf(buffer_ptr, "%s %d %s\r\n", response->version, response->statusCode, response->reason);
     for (int j = 0; j < response->headers_count; j++) {
@@ -54,18 +55,7 @@ char* serialize_response(HttpResponse* response) {
     buffer_ptr += sprintf(buffer_ptr, "\r\n");
     buffer_ptr += sprintf(buffer_ptr, "%s", response->body);
 
-    free_response(response);
     return buffer;
-}
-
-void free_response(HttpResponse* response) {
-    for (int i = 0; i < response->headers_count; i++) {
-        free(response->headers[i].name);
-        free(response->headers[i].value);
-}
-    free(response->headers);
-    if (response->body_len > 0) free(response->body);
-    free(response);
 }
 
 char* fetch_resource(HttpRequest* request, int* body_len) {

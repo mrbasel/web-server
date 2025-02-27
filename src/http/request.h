@@ -1,6 +1,9 @@
 struct HttpHeader;
 typedef struct HttpHeader HttpHeader;
 
+struct Arena;
+typedef struct Arena Arena;
+
 typedef struct HttpRequest {
     char* method;
     char* uri;
@@ -9,6 +12,4 @@ typedef struct HttpRequest {
     int headers_count;
 } HttpRequest;
 
-HttpRequest* parse_request(char* request);
-
-void free_request(HttpRequest* request);
+HttpRequest* parse_request(char* request, Arena* arena);

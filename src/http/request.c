@@ -4,9 +4,10 @@
 #include "http/constants.h"
 #include "http/request.h"
 #include "http/headers.h"
+#include "arena/arena.h"
 
-HttpRequest* parse_request(char* request) {
-    HttpRequest* parsed_request = malloc(sizeof(HttpRequest));
+HttpRequest* parse_request(char* request, Arena* arena) {
+    HttpRequest* parsed_request = arena_alloc(arena, sizeof(HttpRequest));
     if (parsed_request == NULL) return NULL;
 
     parsed_request->method = strsep(&request, " ");
@@ -14,7 +15,8 @@ HttpRequest* parse_request(char* request) {
     parsed_request->version = strsep(&request, "\r");
     if (request != NULL) request++; // skip newline
 
-    HttpHeader* headers = malloc(sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
+
+    HttpHeader* headers = arena_alloc(arena, sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
     if (headers == NULL) return NULL;
     parsed_request->headers = headers;
 
@@ -32,9 +34,4 @@ HttpRequest* parse_request(char* request) {
     }
     parsed_request->headers_count = i;
     return parsed_request;
-}
-
-void free_request(HttpRequest* request) {
-    free(request->headers);
-    free(request);
 }

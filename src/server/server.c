@@ -6,6 +6,8 @@
 #include "server/server.h"
 #include "socket.h"
 #include "http/utils.h"
+#include "arena/arena.h"
+#include "http/constants.h"
 
 #define BUFFER_SIZE 1024
 
@@ -27,25 +29,26 @@ typedef struct {
 } RequestArgs;
 
 int handle_request(void* arg) {
+    Arena* arena = arena_init(ARENA_SIZE);
     RequestArgs* args = (RequestArgs*)arg;
     char* buffer = args->buffer;
     int socket = args->socket;
     RequestHandler handler = args->handler;
 
-    HttpRequest* parsed_request = parse_request(buffer);
+    HttpRequest* parsed_request = parse_request(buffer, arena);
     if (parsed_request == NULL) {
         free(args);
         fprintf(stderr, "could not parse request\n");
         return 1;
     }
 
-    HttpResponse* response = create_response(parsed_request, handler);
+    HttpResponse* response = create_response(parsed_request, handler, arena);
     log_http_transaction(parsed_request, response);
 
-    char* serialized_response = serialize_response(response);
+    char* serialized_response = serialize_response(response, arena);
     send(socket, serialized_response, strlen(serialized_response), 0);
 
-    free_request(parsed_request);
+    arena_free(arena);
     close(socket);
     free(args);
     return 0;
