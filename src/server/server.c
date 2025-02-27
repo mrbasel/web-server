@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <threads.h>
+#include <string.h>
 #include "server/server.h"
 #include "socket.h"
 #include "http/utils.h"
@@ -23,7 +24,7 @@ Server* create_server(int port) {
 }
 
 typedef struct {
-    char* buffer;
+    char buffer[BUFFER_SIZE];
     int socket;
     RequestHandler handler;
 } RequestArgs;
@@ -56,13 +57,12 @@ int handle_request(void* arg) {
 
 void server_listen(Server* server, RequestHandler handler) {
     char buffer[BUFFER_SIZE] = {0};
-
     int accepted_socket;
     thrd_t t;
     while(1) {
         accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr, buffer, BUFFER_SIZE);
         RequestArgs* args = malloc(sizeof(RequestArgs));
-        args->buffer = buffer;
+        memcpy(args->buffer, buffer, BUFFER_SIZE);
         args->socket = accepted_socket;
         args->handler = handler;
         thrd_create(&t, handle_request, args);
