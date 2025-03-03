@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -fsanitize=address -g -I src
+CFLAGS = -pthread -fsanitize=address -g -I src
 SRCS = $(shell find src -name '*.c' ! -path "*/tests/*")
 TEST_SRCS = src/tests/test.c
 PROGRAM = program

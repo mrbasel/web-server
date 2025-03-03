@@ -1,5 +1,8 @@
 #include "http/request.h"
 #include "http/response.h"
+#include "http/constants.h"
+
+#define BUFFER_SIZE 1024
 
 struct HttpRequest;
 typedef struct HttpRequest HttpRequest;
@@ -12,6 +15,12 @@ typedef struct {
    struct sockaddr_in* _socket_addr;
    int port;
 } Server;
+
+typedef struct RequestArgs {
+    char buffer[BUFFER_SIZE];
+    int socket;
+    RequestHandler handler;
+} RequestArgs;
 
 void free_server(Server* server);
 

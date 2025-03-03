@@ -9,8 +9,7 @@
 #include "http/utils.h"
 #include "arena/arena.h"
 #include "http/constants.h"
-
-#define BUFFER_SIZE 1024
+#include "pool/pool.h"
 
 Server* create_server(int port) {
     Server* server = malloc(sizeof(Server));
@@ -22,12 +21,6 @@ Server* create_server(int port) {
     server->_socket_addr = socket_addr;
     return server;
 }
-
-typedef struct {
-    char buffer[BUFFER_SIZE];
-    int socket;
-    RequestHandler handler;
-} RequestArgs;
 
 int handle_request(void* arg) {
     Arena* arena = arena_init(ARENA_SIZE);
@@ -57,6 +50,8 @@ int handle_request(void* arg) {
 
 void server_listen(Server* server, RequestHandler handler) {
     char buffer[BUFFER_SIZE] = {0};
+    Pool* pool = pool_init(4);
+
     int accepted_socket;
     thrd_t t;
     while(1) {
@@ -65,10 +60,10 @@ void server_listen(Server* server, RequestHandler handler) {
         memcpy(args->buffer, buffer, BUFFER_SIZE);
         args->socket = accepted_socket;
         args->handler = handler;
-        thrd_create(&t, handle_request, args);
-        thrd_detach(t);
+        pool_add_work(pool, (void (*)(void*))handle_request, args);
     }
     free_server(server);
+    pool_free(pool);
 }
 
 void free_server(Server* server) {
