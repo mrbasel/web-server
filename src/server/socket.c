@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 
 struct sockaddr_in* create_server_sockaddr(int port) {
     struct sockaddr_in* address = malloc(sizeof(struct sockaddr_in));
@@ -22,6 +23,7 @@ int create_server_socket(struct sockaddr_in* address) {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
+    fcntl(server_fd, F_SETFL, O_NONBLOCK);
 
     int opt = 1;
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
@@ -46,16 +48,9 @@ int create_server_socket(struct sockaddr_in* address) {
     return server_fd;
 }
 
-int accept_connection(int server_fd, struct sockaddr_in* address, char* buffer, int n) {
+int accept_connection(int server_fd, struct sockaddr_in* address) {
     int addrlen = sizeof(*address);
-    int accepted_socket;
-    if ((accepted_socket = accept(server_fd, (struct sockaddr *)address,
-                    (socklen_t*)&addrlen)) < 0) {
-        perror("accept failed");
-        exit(EXIT_FAILURE);
-    }
+    int accepted_socket = accept(server_fd, (struct sockaddr *)address, (socklen_t*)&addrlen);
 
-    int valread = read(accepted_socket, buffer, n);
-    
     return accepted_socket;
 }

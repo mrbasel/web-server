@@ -4,7 +4,9 @@
 #include <unistd.h>
 #include <threads.h>
 #include <string.h>
+#include <poll.h>
 #include "server/server.h"
+#include "server/fds_list.h"
 #include "socket.h"
 #include "http/utils.h"
 #include "arena/arena.h"
@@ -25,9 +27,9 @@ Server* create_server(int port) {
 int handle_request(void* arg) {
     Arena* arena = arena_init(ARENA_SIZE);
     RequestArgs* args = (RequestArgs*)arg;
-    char* buffer = args->buffer;
     int socket = args->socket;
     RequestHandler handler = args->handler;
+    char* buffer = args->buffer;
 
     HttpRequest* parsed_request = parse_request(buffer, arena);
     if (parsed_request == NULL) {
@@ -43,24 +45,45 @@ int handle_request(void* arg) {
     send(socket, serialized_response, strlen(serialized_response), 0);
 
     arena_free(arena);
-    close(socket);
     free(args);
     return 0;
 }
 
 void server_listen(Server* server, RequestHandler handler) {
-    char buffer[BUFFER_SIZE] = {0};
     Pool* pool = pool_init(4);
+    FDS_LIST* fds_list = fds_list_init();
 
     int accepted_socket;
     thrd_t t;
     while(1) {
-        accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr, buffer, BUFFER_SIZE);
-        RequestArgs* args = malloc(sizeof(RequestArgs));
-        memcpy(args->buffer, buffer, BUFFER_SIZE);
-        args->socket = accepted_socket;
-        args->handler = handler;
-        pool_add_work(pool, (void (*)(void*))handle_request, args);
+        accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr);
+        if (accepted_socket > 0) {
+            struct pollfd poll_fd;
+            poll_fd.fd = accepted_socket;
+            poll_fd.events = POLLIN;
+            fds_list_insert(fds_list, poll_fd);
+        }
+
+        int events_count = poll(fds_list->array, fds_list->size, 100); 
+        if (events_count > 0) {
+            for (int i = 0; i < fds_list->size; i++) {
+                if (fds_list->array[i].revents & POLLIN) {
+                    RequestArgs* args = malloc(sizeof(RequestArgs));
+                    args->socket = fds_list->array[i].fd;
+                    args->handler = handler;
+
+                    int bytes_read = read(args->socket, args->buffer, BUFFER_SIZE);
+                    if (bytes_read < 1) {
+                        close(fds_list->array[i].fd);
+                        fds_list_delete(fds_list, i);
+                        free(args);
+                        continue;
+                    }
+
+                    pool_add_work(pool, (void (*)(void*))handle_request, args);
+                }
+            }
+        }
     }
     free_server(server);
     pool_free(pool);
