@@ -39,6 +39,14 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler, Aren
     }
 
     response->reason = get_status_code_reason(response->statusCode);
+    
+    // set "Content-Length" header when applicable
+    if (response->body_len > 0) {
+        char* length = arena_alloc(arena, 5);
+        sprintf(length, "%d", response->body_len);
+        add_header(response, "Content-Length", length);
+    }
+
     return response;
 }
 
