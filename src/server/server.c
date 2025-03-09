@@ -52,35 +52,43 @@ int handle_request(void* arg) {
 void server_listen(Server* server, RequestHandler handler) {
     Pool* pool = pool_init(4);
     FDS_LIST* fds_list = fds_list_init();
+    
+    struct pollfd server_poll_fd;
+    server_poll_fd.fd = server->_socket_fd;
+    server_poll_fd.events = POLLIN;
+    fds_list_insert(fds_list, server_poll_fd);
 
     int accepted_socket;
     thrd_t t;
     while(1) {
-        accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr);
-        if (accepted_socket > 0) {
-            struct pollfd poll_fd;
-            poll_fd.fd = accepted_socket;
-            poll_fd.events = POLLIN;
-            fds_list_insert(fds_list, poll_fd);
-        }
-
-        int events_count = poll(fds_list->array, fds_list->size, 100); 
+        int events_count = poll(fds_list->array, fds_list->size, -1); 
         if (events_count > 0) {
             for (int i = 0; i < fds_list->size; i++) {
                 if (fds_list->array[i].revents & POLLIN) {
-                    RequestArgs* args = malloc(sizeof(RequestArgs));
-                    args->socket = fds_list->array[i].fd;
-                    args->handler = handler;
-
-                    int bytes_read = read(args->socket, args->buffer, BUFFER_SIZE);
-                    if (bytes_read < 1) {
-                        close(fds_list->array[i].fd);
-                        fds_list_delete(fds_list, i);
-                        free(args);
-                        continue;
+                    if (fds_list->array[i].fd == server->_socket_fd) {
+                        accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr);
+                        if (accepted_socket > 0) {
+                            struct pollfd poll_fd;
+                            poll_fd.fd = accepted_socket;
+                            poll_fd.events = POLLIN;
+                            fds_list_insert(fds_list, poll_fd);
+                        }
                     }
+                    else {
+                        RequestArgs* args = malloc(sizeof(RequestArgs));
+                        args->socket = fds_list->array[i].fd;
+                        args->handler = handler;
 
-                    pool_add_work(pool, (void (*)(void*))handle_request, args);
+                        int bytes_read = read(args->socket, args->buffer, BUFFER_SIZE);
+                        if (bytes_read < 1) {
+                            close(fds_list->array[i].fd);
+                            fds_list_delete(fds_list, i);
+                            free(args);
+                            continue;
+                        }
+
+                        pool_add_work(pool, (void (*)(void*))handle_request, args);
+                    }
                 }
             }
         }
