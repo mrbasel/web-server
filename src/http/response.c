@@ -28,14 +28,10 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler, Aren
 
     if (!request->method || !request->uri || !request->version) {
         response->statusCode = 400;
-        response->reason = get_status_code_reason(response->statusCode);
-        return response;
-    }
-
-    if (strcmp(request->method, "GET") != 0) {
+    } else if (strcmp(request->method, "GET") != 0) {
         response->statusCode = 501;
-        response->reason = get_status_code_reason(response->statusCode);
-        return response;
+        response->body = "This method is not supported.";
+        response->body_len = strlen(response->body);
     }
 
     response->reason = get_status_code_reason(response->statusCode);
