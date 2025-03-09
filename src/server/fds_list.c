@@ -24,8 +24,9 @@ void fds_list_insert(FDS_LIST* fds_list, struct pollfd fd) {
 }
 
 void fds_list_delete(FDS_LIST* fds_list, int i) {
-    // TODO: remove from array at some point
-    fds_list->array[i].fd = -1; 
+    fds_list->array[i].fd = fds_list->array[fds_list->size - 1].fd;
+    fds_list->array[i].events = fds_list->array[fds_list->size - 1].events;
+    fds_list->size--;
 }
 
 
