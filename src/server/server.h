@@ -10,6 +10,9 @@ typedef struct HttpRequest HttpRequest;
 struct HttpResponse;
 typedef struct HttpResponse HttpResponse;
 
+struct FDS_LIST;
+typedef struct FDS_LIST FDS_LIST;
+
 typedef struct {
    int _socket_fd; 
    struct sockaddr_in* _socket_addr;
@@ -20,6 +23,7 @@ typedef struct RequestArgs {
     char buffer[BUFFER_SIZE];
     int socket;
     RequestHandler handler;
+    int signal_pipe_fd;
 } RequestArgs;
 
 void free_server(Server* server);

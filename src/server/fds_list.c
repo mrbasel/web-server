@@ -24,9 +24,16 @@ void fds_list_insert(FDS_LIST* fds_list, struct pollfd fd) {
 }
 
 void fds_list_delete(FDS_LIST* fds_list, int i) {
-    fds_list->array[i].fd = fds_list->array[fds_list->size - 1].fd;
-    fds_list->array[i].events = fds_list->array[fds_list->size - 1].events;
-    fds_list->size--;
+    fds_list->array[i].fd = -1;
 }
 
-
+void fds_purge(FDS_LIST* fds_list) {
+    for (int i = 0; i < fds_list->size; i++) {
+        if (fds_list->array[i].fd == -1) {
+            // TODO: handle last element being -1
+            fds_list->array[i].fd = fds_list->array[fds_list->size - 1].fd;
+            fds_list->array[i].events = fds_list->array[fds_list->size - 1].events;
+            fds_list->size--;
+        }
+    }
+}
