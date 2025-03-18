@@ -51,6 +51,10 @@ static void delete_expired_sockets(Server* server, FDS_LIST* fds_list) {
 
 Server* create_server(int port) {
     Server* server = malloc(sizeof(Server));
+    if (server == NULL) {
+        fprintf(stderr, "could not create server\n");
+        return NULL;
+    }
     server->port = port;
 
     struct sockaddr_in* socket_addr = create_server_sockaddr(port);
@@ -98,6 +102,10 @@ void server_listen(Server* server, RequestHandler handler) {
                         }
                         else {
                             RequestArgs* args = malloc(sizeof(RequestArgs));
+                            if (args == NULL) {
+                                fprintf(stderr, "could not process request\n");
+                                continue;
+                            }
                             args->socket = fds_list->array[i].fd;
                             args->handler = handler;
 
