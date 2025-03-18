@@ -23,7 +23,6 @@ typedef struct RequestArgs {
     char buffer[BUFFER_SIZE];
     int socket;
     RequestHandler handler;
-    int signal_pipe_fd;
 } RequestArgs;
 
 void free_server(Server* server);

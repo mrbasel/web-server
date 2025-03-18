@@ -5,6 +5,7 @@
 typedef struct FDS_LIST {
     int size;
     struct pollfd* array;
+    time_t* fd_timestamps;
 } FDS_LIST; 
 
 FDS_LIST* fds_list_init();
