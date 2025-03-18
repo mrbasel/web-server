@@ -16,16 +16,13 @@ static PoolWork* pool_get_work(Pool* pool) {
 }
 
 static void* pool_worker(void* arg) {
-    WorkerArgs* args = (WorkerArgs*)arg;
-    Pool* pool = args->pool;
-    int i = args->i;
+    Pool* pool = arg;
     while (1) {
         pthread_mutex_lock(&(pool->mutex));
 
         while (pool->queue_head == NULL) pthread_cond_wait(&(pool->has_work), &(pool->mutex));
 
         if (pool->should_stop) break;
-        //printf("worker %d received work..\n", i);
         PoolWork* work = pool_get_work(pool);
         pthread_mutex_unlock(&(pool->mutex));
 
@@ -49,11 +46,8 @@ Pool* pool_init(size_t num_workers) {
     pool->queue_tail = NULL;
 
     pthread_t thread;
-    WorkerArgs args[num_workers];
     for (int i = 0; i < num_workers; i++) {
-        args[i].pool = pool;
-        args[i].i = i;
-        pthread_create(&thread, NULL, pool_worker, &args[i]);
+        pthread_create(&thread, NULL, pool_worker, pool);
         pthread_detach(thread);
     }
 
