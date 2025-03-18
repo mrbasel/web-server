@@ -52,8 +52,6 @@ char* serialize_response(HttpResponse* response, Arena* arena) {
     buffer_ptr += sprintf(buffer_ptr, "%s %d %s\r\n", response->version, response->statusCode, response->reason);
     for (int j = 0; j < response->headers_count; j++) {
         HttpHeader header = response->headers[j];
-        int name_len = strlen(header.name);
-        int value_len = strlen(header.value);
         buffer_ptr += sprintf(buffer_ptr, "%s: %s\r\n", header.name, header.value);
     }
     buffer_ptr += sprintf(buffer_ptr, "\r\n");
@@ -62,6 +60,7 @@ char* serialize_response(HttpResponse* response, Arena* arena) {
     return buffer;
 }
 
+/*
 char* fetch_resource(HttpRequest* request, int* body_len) {
     char* resource = malloc(5000);
 
@@ -78,6 +77,7 @@ char* fetch_resource(HttpRequest* request, int* body_len) {
     *body_len = i;
     return resource;
 }
+*/
 
 const char* get_status_code_reason(int status_code) {
     switch (status_code) {

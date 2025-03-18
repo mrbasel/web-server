@@ -15,7 +15,7 @@ static PoolWork* pool_get_work(Pool* pool) {
     return work;
 }
 
-static void* pool_worker(void* arg) {
+static void pool_worker(void* arg) {
     Pool* pool = arg;
     while (1) {
         pthread_mutex_lock(&(pool->mutex));
@@ -46,7 +46,7 @@ Pool* pool_init(size_t num_workers) {
     pool->queue_tail = NULL;
 
     pthread_t thread;
-    for (int i = 0; i < num_workers; i++) {
+    for (size_t i = 0; i < num_workers; i++) {
         pthread_create(&thread, NULL, pool_worker, pool);
         pthread_detach(thread);
     }

@@ -1,5 +1,5 @@
-#include "server/server.h"
 #include <string.h>
+#include "server/server.h"
 
 #define PORT 8000
 

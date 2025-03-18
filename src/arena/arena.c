@@ -18,7 +18,7 @@ void* arena_alloc(Arena* arena, int size) {
     return addr;
 }
 
-void* arena_free(Arena* arena) {
+void arena_free(Arena* arena) {
     free(arena->memory);
     free(arena);
 }

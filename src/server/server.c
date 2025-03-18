@@ -68,7 +68,7 @@ void server_listen(Server* server, RequestHandler handler) {
 
     if (pipe(pipe_fds) != 0) {
         fprintf(stderr, "could not create signal pipe\n");
-        return 1;
+        return;
     }
     // add pipe socket to array for signaling socket close
     struct pollfd pipe_poll_fd;
@@ -76,15 +76,13 @@ void server_listen(Server* server, RequestHandler handler) {
     pipe_poll_fd.events = POLLIN;
     fds_list_insert(fds_list, pipe_poll_fd);
     
-
     int accepted_socket;
-    thrd_t t;
     while(1) {
         int events_count = poll(fds_list->array, fds_list->size, -1); 
         if (events_count > 0) {
             int size = fds_list->size;
             for (int i = 0; i < size; i++) {
-                if (fds_list->array[i].fd > 0)
+                if (fds_list->array[i].fd > 0) {
                     if (fds_list->array[i].revents & POLLNVAL) {
                         close(fds_list->array[i].fd);
                         fds_list_delete(fds_list, i);
@@ -124,6 +122,7 @@ void server_listen(Server* server, RequestHandler handler) {
                             pool_add_work(pool, (void (*)(void*))handle_request, args);
                         }
                     }
+                }
             }
         }
         // remove fds with value of -1

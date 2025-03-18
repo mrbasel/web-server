@@ -8,4 +8,4 @@ Arena* arena_init();
 
 void* arena_alloc(Arena* arena, int size);
 
-void* arena_free(Arena* arena);
+void arena_free(Arena* arena);

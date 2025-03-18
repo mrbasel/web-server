@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -pthread -fsanitize=address -g -I src
+CFLAGS = -Wall -Wextra -pthread -fsanitize=address -g -I src
 RELEASE_FLAGS = -pthread -O2 -I src
 SRCS = $(shell find src -name '*.c' ! -path "*/tests/*")
 TEST_SRCS = src/tests/test.c
