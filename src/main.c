@@ -4,9 +4,11 @@
 #define PORT 8000
 
 HttpResponse* handler(HttpRequest* req, HttpResponse* res) {
-    res->body = strdup("Hello, World!");
-    res->body_len = strlen(res->body);
-    res->statusCode = 200;
+    if (strcmp(req->method, "GET") == 0) {
+        strcpy(res->body, "Hello, World!\n");
+        res->body_len = strlen(res->body);
+        res->statusCode = 200;
+    }
     return res;
 }
 

@@ -21,17 +21,18 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler, Aren
     char* date_buffer = arena_alloc(arena, 50);
     get_date_string(date_buffer);
     add_header(response, "Date", date_buffer);
-
     response->version = "HTTP/1.1";
+
+    response->body = arena_alloc(arena, MAX_RESPONSE_BODY_SIZE);
 
     handler(request, response);
 
     if (!request->method || !request->uri || !request->version) {
         response->statusCode = 400;
     } else if (strcmp(request->method, "GET") != 0) {
-        response->statusCode = 501;
-        response->body = "This method is not supported.";
+        strcpy(response->body,  "This method is not supported.");
         response->body_len = strlen(response->body);
+        response->statusCode = 501;
     }
 
     response->reason = get_status_code_reason(response->statusCode);
