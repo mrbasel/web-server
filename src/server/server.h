@@ -31,4 +31,4 @@ Server* create_server(int port);
 
 typedef HttpResponse* (*RequestHandler)(HttpRequest*, HttpResponse*);
 
-void server_listen(Server* server, RequestHandler request_handler);
+void server_listen(Server* server, RequestHandler request_handler, size_t workers);

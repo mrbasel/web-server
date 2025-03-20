@@ -44,7 +44,6 @@ int create_server_socket(struct sockaddr_in* address) {
         perror("listen failed");
         exit(EXIT_FAILURE);
     }
-    printf("Server listening at %d\n", ntohs(address->sin_port));
     return server_fd;
 }
 

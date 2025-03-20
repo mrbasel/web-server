@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "server/server.h"
 
@@ -12,7 +13,12 @@ HttpResponse* handler(HttpRequest* req, HttpResponse* res) {
     return res;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    size_t workers = 4;
+    if (argc > 1 && (strtol(argv[1], NULL, 10)) != 0) {
+        workers = strtol(argv[1], NULL, 10);
+    }
     Server* server = create_server(PORT); 
-    server_listen(server, handler);
+    printf("Server listening at %d with %ld workers\n", server->port, workers);
+    server_listen(server, handler, 4);
 }

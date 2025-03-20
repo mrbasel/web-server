@@ -69,8 +69,8 @@ void free_server(Server* server) {
     free(server);
 }
 
-void server_listen(Server* server, RequestHandler handler) {
-    Pool* pool = pool_init(4);
+void server_listen(Server* server, RequestHandler handler, size_t workers) {
+    Pool* pool = pool_init(workers);
     FDS_LIST* fds_list = fds_list_init();
     
     // add listener socket to array
