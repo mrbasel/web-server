@@ -25,7 +25,7 @@ typedef struct WorkerArgs {
 
 Pool* pool_init(size_t num_workers);
 
-void pool_add_work(Pool* pool, work_func func, void* args);
+int pool_add_work(Pool* pool, work_func func, void* args);
 
 void pool_free(Pool* pool);
 

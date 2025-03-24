@@ -4,6 +4,7 @@
 
 Arena* arena_init(int arena_size) {
     Arena* arena = malloc(sizeof(Arena));
+    if (arena == NULL) return NULL;
     arena->size = arena_size;
     arena->memory = malloc(arena_size);
     arena->offset_ptr = arena->memory;

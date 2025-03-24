@@ -15,6 +15,10 @@
 
 static int handle_request(void* arg) {
     Arena* arena = arena_init(ARENA_SIZE);
+    if (arena == NULL) {
+        fprintf(stderr, "Error: failed to create arena\n");
+        return 1;
+    }
     RequestArgs* args = (RequestArgs*)arg;
     int socket = args->socket;
     RequestHandler handler = args->handler;
@@ -23,11 +27,15 @@ static int handle_request(void* arg) {
     HttpRequest* parsed_request = parse_request(buffer, arena);
     if (parsed_request == NULL) {
         free(args);
-        fprintf(stderr, "could not parse request\n");
+        fprintf(stderr, "Error: could not parse request\n");
         return 1;
     }
 
     HttpResponse* response = create_response(parsed_request, handler, arena);
+    if (response == NULL) {
+        fprintf(stderr, "Error: could not create response\n");
+        return 1;
+    }
     log_http_transaction(parsed_request, response);
 
     char* serialized_response = serialize_response(response, arena);
@@ -52,7 +60,7 @@ static void delete_expired_sockets(Server* server, FDS_LIST* fds_list) {
 Server* create_server(int port) {
     Server* server = malloc(sizeof(Server));
     if (server == NULL) {
-        fprintf(stderr, "could not create server\n");
+        fprintf(stderr, "Error: failed to create server\n");
         return NULL;
     }
     server->port = port;
@@ -103,7 +111,7 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
                         else {
                             RequestArgs* args = malloc(sizeof(RequestArgs));
                             if (args == NULL) {
-                                fprintf(stderr, "could not process request\n");
+                                fprintf(stderr, "Error: could not process request\n");
                                 continue;
                             }
                             args->socket = fds_list->array[i].fd;

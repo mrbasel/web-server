@@ -61,25 +61,6 @@ char* serialize_response(HttpResponse* response, Arena* arena) {
     return buffer;
 }
 
-/*
-char* fetch_resource(HttpRequest* request, int* body_len) {
-    char* resource = malloc(5000);
-
-    char buffer[100];
-    FILE* file;
-    file = fopen("/var/www/html/index.html", "r");
-    int i = 0;
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        for (int j = 0; buffer[j] != 0; j++) {
-            resource[i++] = buffer[j];
-        }
-    };
-    resource[i] = 0;
-    *body_len = i;
-    return resource;
-}
-*/
-
 const char* get_status_code_reason(int status_code) {
     switch (status_code) {
         case 100: return "Continue";

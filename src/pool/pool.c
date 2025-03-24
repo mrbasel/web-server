@@ -36,6 +36,10 @@ static void pool_worker(void* arg) {
 
 Pool* pool_init(size_t num_workers) {
     Pool* pool = malloc(sizeof(Pool)); 
+    if (pool == NULL) {
+        fprintf(stderr, "Error: failed to create workers pool\n");
+        return NULL;
+    }
     pool->workers_count = num_workers;
     pool->queue_tail = NULL;
     pool->should_stop = 0;
@@ -71,8 +75,12 @@ void pool_free(Pool* pool) {
     free(pool);
 }
 
-void pool_add_work(Pool* pool, work_func func, void* args) {
+int pool_add_work(Pool* pool, work_func func, void* args) {
     PoolWork* work = malloc(sizeof(PoolWork));
+    if (work == NULL) {
+        fprintf(stderr, "Error: failed to add work to pool\n");
+        return 1;
+    }
     work->args = args;
     work->func = func;
     work->next = NULL;
@@ -90,4 +98,5 @@ void pool_add_work(Pool* pool, work_func func, void* args) {
 
     pthread_cond_broadcast(&(pool->has_work));
     pthread_mutex_unlock(&(pool->mutex));
+    return 0;
 }
