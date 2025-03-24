@@ -3,6 +3,13 @@
 
 This is a small lightweight HTTP 1.1 server implementation written using the C programming language.
 
+## Usage
+
+After cloning the project, run `make`, then run the program (first arg is port and second is workers):
+```
+.\program 3000 4
+```
+
 ## Motivation
 
 The main goal of this project was to help me learn C. I ended up learning a lot about how web servers work, socket programming and managing memory in large applications. 

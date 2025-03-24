@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -pthread -fsanitize=address -g -I src
 RELEASE_FLAGS = -pthread -O2 -I src
 SRCS = $(shell find src -name '*.c' ! -path "*/tests/*")
 TEST_SRCS = src/tests/test.c
-PROGRAM = program
+PROGRAM = server
 TEST_PROGRAM = test_runner
 
 all: $(PROGRAM)
