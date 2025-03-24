@@ -5,9 +5,9 @@ This is a small lightweight HTTP 1.1 server implementation written using the C p
 
 ## Usage
 
-After cloning the project, run `make`, then run the program (first arg is port and second is workers):
+After cloning the project, run `make`, then run the server (first arg is port and second is workers):
 ```
-.\program 3000 4
+.\server 3000 4
 ```
 
 ## Motivation
