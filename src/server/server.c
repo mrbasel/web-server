@@ -100,7 +100,7 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
                     }
                     else if (fds_list->array[i].revents & POLLIN) {
                         if (fds_list->array[i].fd == server->_socket_fd) {
-                            accepted_socket = accept_connection(server->_socket_fd, server->_socket_addr);
+                            accepted_socket = accept_connection(server->_socket_fd);
                             if (accepted_socket > 0) {
                                 struct pollfd poll_fd;
                                 poll_fd.fd = accepted_socket;

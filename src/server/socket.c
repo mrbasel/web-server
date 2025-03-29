@@ -50,9 +50,8 @@ int create_server_socket(struct sockaddr_in* address) {
     return server_fd;
 }
 
-int accept_connection(int server_fd, struct sockaddr_in* address) {
-    int addrlen = sizeof(*address);
-    int accepted_socket = accept(server_fd, (struct sockaddr *)address, (socklen_t*)&addrlen);
+int accept_connection(int server_fd) {
+    int accepted_socket = accept(server_fd, NULL, NULL);
 
     return accepted_socket;
 }
