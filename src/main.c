@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "server/server.h"
+#include "nadel.h"
 
 #define DEFAULT_PORT 8000
 

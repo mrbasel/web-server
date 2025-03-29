@@ -1,4 +1,4 @@
-# Http Server
+# Nadel-HTTP
 **NOTE: This project is currently for educational purposes and should not be used in production**
 
 This is a small lightweight HTTP 1.1 server implementation written using the C programming language.

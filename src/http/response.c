@@ -17,7 +17,7 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler, Aren
     response->headers = headers;
     if (headers == NULL) return NULL;
 
-    add_header(response, "Server", "Http Server");
+    add_header(response, "Server", "Nadel-HTTP");
     char* date_buffer = arena_alloc(arena, 50);
     get_date_string(date_buffer);
     add_header(response, "Date", date_buffer);
