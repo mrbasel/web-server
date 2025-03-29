@@ -1,13 +1,26 @@
 #include <stdio.h>
 #include <time.h>
+#include <arpa/inet.h>
 #include "http/utils.h"
 #include "http/request.h"
 #include "http/response.h"
 
-void log_http_transaction(HttpRequest* request, HttpResponse* response) {
+void log_http_transaction(int socket_fd, HttpRequest* request, HttpResponse* response) {
+    // TODO: refactor body
+    struct sockaddr_in client_addr;
+    socklen_t addr_len = sizeof(client_addr);
+    char client_ip[INET_ADDRSTRLEN];
+
+    int peername_err = getpeername(socket_fd, (struct sockaddr*)&client_addr, &addr_len);
+
+    inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
+    int port = ntohs(client_addr.sin_port);
+
     if (!request->method || !request->uri || !request->version) printf("GET / HTTP/1.1 %d\n", response->statusCode);
+    else if (peername_err)
+        printf("\"%s %s %s\" %d\n", request->method, request->uri, request->version, response->statusCode);
     else
-        printf("%s %s %s %d\n", request->method, request->uri, request->version, response->statusCode);
+        printf("%s:%d - \"%s %s %s\" %d\n", client_ip, port, request->method, request->uri, request->version, response->statusCode);
 }
 
 static const char *weekdays[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};

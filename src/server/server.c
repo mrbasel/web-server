@@ -36,7 +36,7 @@ static int handle_request(void* arg) {
         fprintf(stderr, "Error: could not create response\n");
         return 1;
     }
-    log_http_transaction(parsed_request, response);
+    log_http_transaction(socket, parsed_request, response);
 
     char* serialized_response = serialize_response(response, arena);
     send(socket, serialized_response, strlen(serialized_response), 0);
