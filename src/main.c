@@ -14,14 +14,45 @@ HttpResponse* handler(HttpRequest* req, HttpResponse* res) {
     return res;
 }
 
+void print_error_message() {
+    printf("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n");
+    printf("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⢶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣄⡀⠀⠀⠀⠀⠀⠀\n");
+    printf("⠀⠀⠀⠀⠀⠀⠀⢀⣴⣾⣿⣮⣶⣶⣮⣞⣭⡝⡽⢻⣿⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀\n");
+    printf("⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣛⠿⣿⣿⣿⣷⣄⠀⠀\n");
+    printf("⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣿⢟⣿⡿⣫⣿⣿⠟⣿⣿⣿⣿⣶⣧⣬⣛⠻⡟⣆⠀\n");
+    printf("⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⡿⢅⣿⠏⣠⡿⡿⠋⠀⣿⣿⡿⣹⣿⣿⣿⣿⣿⣧⣿⡀\n");
+    printf("⠀⠀⠀⢰⣿⣿⣿⣿⣳⣋⣤⣾⣥⡠⡟⡹⠁⠀⠀⣿⢿⡇⢸⣿⣿⣿⣿⣿⣿⣿⡇\n");
+    printf("⠀⠀⢠⣿⣿⣿⣿⢣⠎⣠⣿⣿⣿⡿⠀⠀⠀⠀⠀⢋⢸⢻⢸⣿⠱⣿⣿⣿⣿⣿⡇\n");
+    printf("⠀⢠⣿⣿⣿⣿⠁⠸⠀⠿⢿⣿⣿⠀⠀⠀⠀⠀⠀⢨⣶⣶⣬⠏⢹⣟⣿⣿⣿⣿⠃\n");
+    printf("⠀⣾⣿⣿⣿⡿⠀⠀⠠⢲⣾⡯⠃⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⢶⢸⢹⣿⣿⣿⣿⠀\n");
+    printf("⣼⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⢙⣿⣿⡇⢸⡌⣾⣿⣿⣿⡗⠀\n");
+    printf("⣿⣿⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠙⠿⣛⠋⠀⠁⣰⣿⣿⣿⣿⠃⠀\n");
+    printf("⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⡏⠀⠀\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠁⠂⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⡿⠀⠀⠀\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⠃⠳⢄⢀⡀⢀⡀⡀⢀⣀⣠⣤⣶⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀\n");
+    printf("⡟⢸⡿⠃⠉⣠⡿⠃⠀⠀⠈⠹⠿⠯⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀\n");
+    printf("⠉⠀⠀⢀⡞⠁⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⠀⠀⠀⠀\n");
+    printf("⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠹⡿⣽⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀\n");
+    printf("⠀⠀⠀⠀⡄⠀⠀⠄⠀⠀⠀⢀⡀⠀⠁⠀⠀⠱⣿⣿⣿⣿⢿⣿⡟⠀⠀⠀⠀⠀⠀\n");
+    printf("osaka say that there's somewthing wen't wrong \n")
+}
+
 int main(int argc, char* argv[]) {
     size_t workers = 4;
     int port = DEFAULT_PORT;
-
-    if (argc > 1 && (strtol(argv[1], NULL, 10)) != 0) {
+      // my void 1
+      if (argc > 1 && (strtol(argv[1], NULL, 10)) == 0) {
+        print_error_message();
+        return 1; // exit if invalid port
+    } else if (argc > 1) {
         port = strtol(argv[1], NULL, 10);
     }
-    if (argc > 2 && (strtol(argv[2], NULL, 10)) != 0) {
+
+    // my void 2 
+    if (argc > 2 && (strtol(argv[2], NULL, 10)) == 0) {
+        print_error_message();
+        return 1; // exit if invalid workers
+    } else if (argc > 2) {
         workers = strtol(argv[2], NULL, 10);
     }
     Server* server = create_server(port);
