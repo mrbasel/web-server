@@ -15,6 +15,10 @@ HttpRequest* parse_request(char* request, Arena* arena) {
     parsed_request->version = strsep(&request, "\r");
     if (request != NULL) request++; // skip newline
 
+    // validate request line
+    if (!parsed_request->method || !parsed_request->uri || !parsed_request->version) return NULL;
+    if (parsed_request->uri[0] != '/') return NULL; // TODO: validate URI properly
+    if (strcmp(parsed_request->version, "HTTP/1.1") != 0) return NULL;
 
     HttpHeader* headers = arena_alloc(arena, sizeof(HttpHeader) * MAX_REQUEST_HEADERS_COUNT);
     if (headers == NULL) return NULL;
