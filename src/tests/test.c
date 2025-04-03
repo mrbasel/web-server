@@ -41,7 +41,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "/logo.png HTTP/1.1\r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("invalid request line (missing method) should fail", request == NULL);
+        AssertTrue("invalid request line (missing method) should fail", !request->_is_valid);
         arena_free(arena);
     }
 
@@ -49,7 +49,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "\r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("empty request line should fail", request == NULL);
+        AssertTrue("empty request line should fail", !request->_is_valid);
         arena_free(arena);
     }
 
@@ -57,7 +57,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "GET /logo with spaces.png HTTP/1.1\r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("invalid URI with spaces should fail", request == NULL);
+        AssertTrue("invalid URI with spaces should fail", !request->_is_valid);
         arena_free(arena);
     }
 
@@ -65,7 +65,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "GET  HTTP/1.1\r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("empty URI should fail", request == NULL);
+        AssertTrue("empty URI should fail", !request->_is_valid);
         arena_free(arena);
     }
 
@@ -73,7 +73,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "GET /logo.png HTTP/1.0\r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("HTTP/1.0 protocol should fail", request == NULL);
+        AssertTrue("HTTP/1.0 protocol should fail", !request->_is_valid);
         arena_free(arena);
     }
 
@@ -81,7 +81,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "GET /logo.png HTTP/9.9\r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("malformed protocol should fail", request == NULL);
+        AssertTrue("malformed protocol should fail", !request->_is_valid);
         arena_free(arena);
     }
 
@@ -89,7 +89,7 @@ void main() {
         Arena* arena = arena_init(ARENA_SIZE);
         char buffer[] = "GET /logo.png \r\n";
         HttpRequest* request = parse_request(buffer, arena);
-        AssertTrue("missing protocol should fail", request == NULL);
+        AssertTrue("missing protocol should fail", !request->_is_valid);
         arena_free(arena);
     }
 

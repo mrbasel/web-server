@@ -10,6 +10,7 @@ typedef struct HttpRequest {
     char* version;
     struct HttpHeader* headers;
     int headers_count;
+    int _is_valid;
 } HttpRequest;
 
 HttpRequest* parse_request(char* request, Arena* arena);

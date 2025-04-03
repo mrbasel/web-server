@@ -16,7 +16,7 @@ void log_http_transaction(int socket_fd, HttpRequest* request, HttpResponse* res
     inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
     int port = ntohs(client_addr.sin_port);
 
-    if (!request->method || !request->uri || !request->version) printf("GET / HTTP/1.1 %d\n", response->statusCode);
+    if (!request->_is_valid) printf("%d %s\n", response->statusCode, response->reason);
     else if (peername_err)
         printf("\"%s %s %s\" %d\n", request->method, request->uri, request->version, response->statusCode);
     else

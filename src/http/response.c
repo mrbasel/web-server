@@ -27,7 +27,7 @@ HttpResponse* create_response(HttpRequest* request, RequestHandler handler, Aren
 
     handler(request, response);
 
-    if (!request->method || !request->uri || !request->version) {
+    if (!request->_is_valid) {
         response->statusCode = 400;
     } else if (strcmp(request->method, "GET") != 0) {
         strcpy(response->body,  "This method is not supported.");
