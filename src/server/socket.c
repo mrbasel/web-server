@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include "socket.h"
 
 struct sockaddr_in* create_server_sockaddr(int port) {
     struct sockaddr_in* address = malloc(sizeof(struct sockaddr_in));
@@ -43,7 +44,7 @@ int create_server_socket(struct sockaddr_in* address) {
     }
 
     // listen for incoming connections (passive mode)
-    if (listen(server_fd, 3) < 0) {
+    if (listen(server_fd, MAX_PENDING_CONNECTIONS) < 0) {
         fprintf(stderr, "Error: failed to listen on server socket\n");
         return -1;
     }
