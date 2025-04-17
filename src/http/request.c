@@ -20,7 +20,7 @@ HttpRequest* parse_request(char* request, Arena* arena) {
     // validate request line
     if (!parsed_request->method || !parsed_request->uri || !parsed_request->version) parsed_request->_is_valid = 0;
     if (parsed_request->uri && parsed_request->uri[0] != '/') parsed_request->_is_valid = 0; // TODO: validate URI properly
-    if (parsed_request->version && strcmp(parsed_request->version, "HTTP/1.1") != 0) parsed_request->_is_valid = 0;
+    if (parsed_request->version && (strcmp(parsed_request->version, "HTTP/1.0") != 0 && strcmp(parsed_request->version, "HTTP/1.1") != 0)) parsed_request->_is_valid = 0;
 
     if (!parsed_request->_is_valid) return parsed_request;
 

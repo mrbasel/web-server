@@ -13,6 +13,9 @@ typedef struct HttpResponse HttpResponse;
 struct FDS_LIST;
 typedef struct FDS_LIST FDS_LIST;
 
+struct ThreadSafeQueue;
+typedef struct ThreadSafeQueue ThreadSafeQueue;
+
 typedef struct {
    int _socket_fd; 
    struct sockaddr_in* _socket_addr;
@@ -22,7 +25,9 @@ typedef struct {
 typedef struct RequestArgs {
     char buffer[BUFFER_SIZE];
     int socket;
+    int efd;
     RequestHandler handler;
+    ThreadSafeQueue* closed_fds_queue;
 } RequestArgs;
 
 void free_server(Server* server);
