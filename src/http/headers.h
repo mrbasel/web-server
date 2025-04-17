@@ -1,3 +1,6 @@
+#ifndef HEADERS_H
+#define HEADERS_H
+
 struct HttpResponse;
 typedef struct HttpResponse HttpResponse;
 
@@ -7,3 +10,5 @@ typedef struct HttpHeader {
 } HttpHeader;
 
 void add_header(struct HttpResponse* response, char* name, char* value);
+
+#endif

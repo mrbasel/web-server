@@ -1,3 +1,6 @@
+#ifndef RESPONSE_H
+#define RESPONSE_H
+
 struct HttpRequest;
 typedef struct HttpRequest HttpRequest;
 
@@ -29,3 +32,5 @@ char* serialize_response(HttpResponse* response, Arena* arena);
 char* fetch_resource(struct HttpRequest* request, int* body_len);
 
 const char* get_status_code_reason(int status_code);
+
+#endif

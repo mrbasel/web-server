@@ -1,3 +1,6 @@
+#ifndef FDS_LIST_H
+#define FDS_LIST_H
+
 #include <poll.h>
 
 #define MAX_SOCKETS_COUNT 500
@@ -20,3 +23,5 @@ void fds_list_delete(FDS_LIST* fds_list, int i);
 
 // removes fds with value -1
 void fds_purge(FDS_LIST* fds_list);
+
+#endif

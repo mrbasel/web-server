@@ -1,3 +1,6 @@
+#ifndef SERVER_H
+#define SERVER_H
+
 #include "http/request.h"
 #include "http/response.h"
 #include "http/constants.h"
@@ -37,3 +40,5 @@ Server* create_server(int port);
 typedef HttpResponse* (*RequestHandler)(HttpRequest*, HttpResponse*);
 
 void server_listen(Server* server, RequestHandler request_handler, size_t workers);
+
+#endif

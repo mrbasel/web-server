@@ -1,3 +1,6 @@
+#ifndef REQUEST_H
+#define REQUEST_H
+
 struct HttpHeader;
 typedef struct HttpHeader HttpHeader;
 
@@ -14,3 +17,5 @@ typedef struct HttpRequest {
 } HttpRequest;
 
 HttpRequest* parse_request(char* request, Arena* arena);
+
+#endif

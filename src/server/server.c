@@ -134,7 +134,7 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
 
     int accepted_socket;
     while(1) {
-        int events_count = poll(fds_list->array, fds_list->size, 5000); 
+        int events_count = poll(fds_list->array, fds_list->size, 5000);
         if (events_count > 0) {
             int size = fds_list->size;
             for (int i = 0; i < size; i++) {

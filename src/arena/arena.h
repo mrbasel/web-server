@@ -1,3 +1,6 @@
+#ifndef ARENA_H
+#define ARENA_H
+
 typedef struct Arena {
     void* memory;
     void* offset_ptr;
@@ -9,3 +12,5 @@ Arena* arena_init();
 void* arena_alloc(Arena* arena, int size);
 
 void arena_free(Arena* arena);
+
+#endif

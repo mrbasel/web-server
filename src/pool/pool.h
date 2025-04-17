@@ -1,3 +1,6 @@
+#ifndef POOL_H
+#define POOL_H
+
 struct RequestArgs;
 typedef struct RequestArgs RequestArgs;
 
@@ -29,3 +32,4 @@ int pool_add_work(Pool* pool, work_func func, void* args);
 
 void pool_free(Pool* pool);
 
+#endif

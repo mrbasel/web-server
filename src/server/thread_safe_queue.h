@@ -1,3 +1,6 @@
+#ifndef THREAD_SAFE_QUEUE_H
+#define THREAD_SAFE_QUEUE_H
+
 #include <stdlib.h>
 #include <pthread.h>
 
@@ -76,3 +79,5 @@ int queue_get_capacity(ThreadSafeQueue* queue) {
     pthread_mutex_unlock(&(queue->mutex));
     return capacity;
 }
+
+#endif
