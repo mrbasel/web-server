@@ -15,6 +15,9 @@
 #include "pool/pool.h"
 #include "server/thread_safe_queue.h"
 
+#define POLL_TIMEOUT 5000
+
+// called by worker to handle a request
 static int handle_request(void* arg) {
     Arena* arena = arena_init(ARENA_SIZE);
     RequestArgs* args = (RequestArgs*)arg;
@@ -33,7 +36,6 @@ static int handle_request(void* arg) {
 
     HttpRequest* parsed_request = parse_request(buffer, arena);
     if (parsed_request == NULL) {
-        free(args);
         fprintf(stderr, "Error: could not parse request\n");
         arena_free(arena);
         free(args);
@@ -54,7 +56,8 @@ static int handle_request(void* arg) {
     if (strcmp(parsed_request->version, "HTTP/1.0") == 0) {
         uint64_t val = (uint64_t)socket;
         queue_enqueue(closed_fds_queue, socket); // schedule fd to be closed
-                                                 // signal to wakeup main thread
+
+        // signal to wakeup main thread
         if ((write(efd, &val, sizeof(val))) == -1) fprintf(stderr, "Error: write to efd failed\n");
     }
 
@@ -64,7 +67,8 @@ static int handle_request(void* arg) {
     return 0;
 }
 
-static void delete_expired_sockets(FDS_LIST* fds_list) {
+// close fds that have been open for a certain duration
+static void close_expired_sockets(FDS_LIST* fds_list) {
     time_t current_time = time(NULL);
     for (int i = 2; i < fds_list->size; i++) {
         if ((current_time - fds_list->fd_timestamps[i]) > 5) {
@@ -74,6 +78,7 @@ static void delete_expired_sockets(FDS_LIST* fds_list) {
     }
 }
 
+// close fds that have been marked to be closed by workers
 static void close_queue_sockets(ThreadSafeQueue* closed_fds_queue, FDS_LIST* fds_list) {
     int capacity = queue_get_capacity(closed_fds_queue);
 
@@ -113,18 +118,18 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
     Pool* pool = pool_init(workers);
     FDS_LIST* fds_list = fds_list_init();
     ThreadSafeQueue* closed_fds_queue = queue_init();
-    
-    // add listener socket to fds array
-    struct pollfd server_poll_fd;
-    server_poll_fd.fd = server->_socket_fd;
-    server_poll_fd.events = POLLIN;
-    fds_list_insert(fds_list, server_poll_fd);
 
-    int efd = eventfd(0, EFD_CLOEXEC);
+    int efd = eventfd(0, EFD_CLOEXEC); // used by worker threads to wakeup main thread
     if (efd == -1) {
         fprintf(stderr, "Error: could not create event fd\n");
         return;
     }
+
+    // add listener fd to fds array
+    struct pollfd server_poll_fd;
+    server_poll_fd.fd = server->_socket_fd;
+    server_poll_fd.events = POLLIN;
+    fds_list_insert(fds_list, server_poll_fd);
 
     // add event fd to fds array
     struct pollfd event_poll_fd;
@@ -134,7 +139,7 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
 
     int accepted_socket;
     while(1) {
-        int events_count = poll(fds_list->array, fds_list->size, 5000);
+        int events_count = poll(fds_list->array, fds_list->size, POLL_TIMEOUT);
         if (events_count > 0) {
             int size = fds_list->size;
             for (int i = 0; i < size; i++) {
@@ -144,6 +149,7 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
                         fds_list_delete(fds_list, i);
                     }
                     else if (fds_list->array[i].revents & POLLIN) {
+                        // handle new connection
                         if (fds_list->array[i].fd == server->_socket_fd) {
                             if (fds_list->size >= MAX_SOCKETS_COUNT) continue;
                             accepted_socket = accept_connection(server->_socket_fd);
@@ -153,10 +159,12 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
                                 poll_fd.events = POLLIN;
                                 fds_list_insert(fds_list, poll_fd);
                             }
+                        // reset wakeup signal
                         } else if (fds_list->array[i].fd == efd) {
                             uint64_t u;
                             read(efd, &u, sizeof(u)); // read wakeup signal
                         }
+                        // handle incoming request
                         else {
                             RequestArgs* args = malloc(sizeof(RequestArgs));
                             if (args == NULL) {
@@ -183,10 +191,11 @@ void server_listen(Server* server, RequestHandler handler, size_t workers) {
         }
 
         close_queue_sockets(closed_fds_queue, fds_list);
-        delete_expired_sockets(fds_list);
+        close_expired_sockets(fds_list);
         fds_purge(fds_list);
     }
     fds_list_free(fds_list);
+    queue_free(closed_fds_queue);
     free_server(server);
     pool_free(pool);
 }
