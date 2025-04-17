@@ -17,13 +17,14 @@
 
 static int handle_request(void* arg) {
     Arena* arena = arena_init(ARENA_SIZE);
+    RequestArgs* args = (RequestArgs*)arg;
     if (arena == NULL) {
         fprintf(stderr, "Error: failed to create arena\n");
         arena_free(arena);
         free(args);
         return 1;
     }
-    RequestArgs* args = (RequestArgs*)arg;
+
     int socket = args->socket;
     int efd = args->efd;
     RequestHandler handler = args->handler;
