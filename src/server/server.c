@@ -18,14 +18,14 @@
 #define POLL_TIMEOUT 5000
 
 // called by worker to handle a request
-static int handle_request(void* arg) {
+static void handle_request(void* arg) {
     Arena* arena = arena_init(ARENA_SIZE);
     RequestArgs* args = (RequestArgs*)arg;
     if (arena == NULL) {
         fprintf(stderr, "Error: failed to create arena\n");
         arena_free(arena);
         free(args);
-        return 1;
+        return;
     }
 
     int socket = args->socket;
@@ -39,7 +39,7 @@ static int handle_request(void* arg) {
         fprintf(stderr, "Error: could not parse request\n");
         arena_free(arena);
         free(args);
-        return 1;
+        return;
     }
 
     HttpResponse* response = create_response(parsed_request, handler, arena);
@@ -47,7 +47,7 @@ static int handle_request(void* arg) {
         fprintf(stderr, "Error: could not create response\n");
         arena_free(arena);
         free(args);
-        return 1;
+        return;
     }
     log_http_transaction(socket, parsed_request, response);
 
@@ -64,7 +64,7 @@ static int handle_request(void* arg) {
     send(socket, serialized_response, strlen(serialized_response), 0);
     arena_free(arena);
     free(args);
-    return 0;
+    return;
 }
 
 // close fds that have been open for a certain duration

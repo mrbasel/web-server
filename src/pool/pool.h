@@ -1,6 +1,8 @@
 #ifndef POOL_H
 #define POOL_H
 
+#include <bits/pthreadtypes.h>
+#include <stddef.h>
 struct RequestArgs;
 typedef struct RequestArgs RequestArgs;
 

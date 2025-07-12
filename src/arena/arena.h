@@ -7,7 +7,7 @@ typedef struct Arena {
     int size;
 } Arena;
 
-Arena* arena_init();
+Arena* arena_init(int arena_size);
 
 void* arena_alloc(Arena* arena, int size);
 

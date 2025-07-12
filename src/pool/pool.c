@@ -15,7 +15,7 @@ static PoolWork* pool_get_work(Pool* pool) {
     return work;
 }
 
-static void pool_worker(void* arg) {
+static void* pool_worker(void* arg) {
     Pool* pool = arg;
     while (1) {
         pthread_mutex_lock(&(pool->mutex));
@@ -30,12 +30,12 @@ static void pool_worker(void* arg) {
             work->func(work->args);
             free(work);
         }
-
     }
+    return 0;
 }
 
 Pool* pool_init(size_t num_workers) {
-    Pool* pool = malloc(sizeof(Pool)); 
+    Pool* pool = malloc(sizeof(Pool));
     if (pool == NULL) {
         fprintf(stderr, "Error: failed to create workers pool\n");
         return NULL;
@@ -60,7 +60,7 @@ Pool* pool_init(size_t num_workers) {
 
 void pool_free(Pool* pool) {
     pthread_mutex_lock(&(pool->mutex));
-    
+
     PoolWork* head = pool->queue_head;
     while (head != NULL) {
         PoolWork* temp = head->next;
