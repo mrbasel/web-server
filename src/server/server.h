@@ -3,7 +3,7 @@
 
 #include "http/request.h"
 #include "http/response.h"
-#include "http/constants.h"
+#include <stddef.h>
 
 #define BUFFER_SIZE 1024
 

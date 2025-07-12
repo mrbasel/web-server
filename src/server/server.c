@@ -7,6 +7,7 @@
 #include <poll.h>
 #include <sys/eventfd.h>
 #include "server/server.h"
+#include "http/headers.h"
 #include "server/fds_list.h"
 #include "socket.h"
 #include "http/utils.h"
@@ -29,7 +30,7 @@ static void handle_request(void* arg) {
     }
 
     int socket = args->socket;
-    int efd = args->efd;
+    int efd = args->efd; // used to wakeup main server thread
     RequestHandler handler = args->handler;
     char* buffer = args->buffer;
     ThreadSafeQueue* closed_fds_queue = args->closed_fds_queue;
@@ -53,12 +54,26 @@ static void handle_request(void* arg) {
 
     char* serialized_response = serialize_response(response, arena);
 
+    // close connection if using HTTP 1.0
     if (strcmp(parsed_request->version, "HTTP/1.0") == 0) {
         uint64_t val = (uint64_t)socket;
         queue_enqueue(closed_fds_queue, socket); // schedule fd to be closed
 
-        // signal to wakeup main thread
         if ((write(efd, &val, sizeof(val))) == -1) fprintf(stderr, "Error: write to efd failed\n");
+    }
+
+    // process headers
+    for (int i = 0; i < parsed_request->headers_count; i++) {
+        char* header_name = parsed_request->headers[i].name;
+        char* header_value = parsed_request->headers[i].value;
+
+        // close connection if connection set to close
+        if (strcmp(header_name, "Connection") && strcmp(header_value, "close")) {
+            uint64_t val = (uint64_t)socket;
+            queue_enqueue(closed_fds_queue, socket); // schedule fd to be closed
+
+            if ((write(efd, &val, sizeof(val))) == -1) fprintf(stderr, "Error: write to efd failed\n");
+        }
     }
 
     send(socket, serialized_response, strlen(serialized_response), 0);
